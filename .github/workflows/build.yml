@@ -17,6 +17,11 @@ jobs:
         with:
           node-version: '18'
 
+      - name: Setup Java JDK
+        uses: actions/setup-java@v5.1.0
+        with:
+          java-version: 17
+          
       - name: Install OH SDK
         run: |
           mkdir -p $HOME/openharmony
@@ -32,37 +37,44 @@ jobs:
         run: |
           echo "OHOS_SDK_HOME=$HOME/openharmony" >> $GITHUB_ENV
           echo "$HOME/openharmony/command-line-tools/bin" >> $GITHUB_PATH
+          hvigorw -v
+          npm config set registry https://repo.huaweicloud.com/repository/npm/
+          npm config set "@ohos:registry" https://repo.harmonyos.com/npm/
+          ohpm -v
+          ohpm config set registry https://ohpm.openharmony.cn/ohpm/
+          ohpm config set strict_ssl false
+          apt install -y libgl1-mesa-dev
 
 
-      - name: Build HarmonyOS App
-        run: |
-          chmod +x hvigorw
-          ./hvigorw assembleHap
+      # - name: Build HarmonyOS App
+      #   run: |
+      #     chmod +x hvigorw
+      #     ./hvigorw assembleHap
 
-      - name: Find HAP file
-        id: find-hap
-        run: |
-          HAP_FILE=$(find . -name "*.hap" | head -n 1)
-          echo "hap_file=$HAP_FILE" >> $GITHUB_OUTPUT
-          echo "Found HAP: $HAP_FILE"
+      # - name: Find HAP file
+      #   id: find-hap
+      #   run: |
+      #     HAP_FILE=$(find . -name "*.hap" | head -n 1)
+      #     echo "hap_file=$HAP_FILE" >> $GITHUB_OUTPUT
+      #     echo "Found HAP: $HAP_FILE"
 
-      - name: Create Release
-        id: create_release
-        uses: actions/create-release@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          tag_name: build-${{ github.run_number }}
-          release_name: Build ${{ github.run_number }}
-          draft: false
-          prerelease: false
+      # - name: Create Release
+      #   id: create_release
+      #   uses: actions/create-release@v1
+      #   env:
+      #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      #   with:
+      #     tag_name: build-${{ github.run_number }}
+      #     release_name: Build ${{ github.run_number }}
+      #     draft: false
+      #     prerelease: false
 
-      - name: Upload Release Asset
-        uses: actions/upload-release-asset@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ${{ steps.find-hap.outputs.hap_file }}
-          asset_name: app.hap
-          asset_content_type: application/octet-stream
+      # - name: Upload Release Asset
+      #   uses: actions/upload-release-asset@v1
+      #   env:
+      #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      #   with:
+      #     upload_url: ${{ steps.create_release.outputs.upload_url }}
+      #     asset_path: ${{ steps.find-hap.outputs.hap_file }}
+      #     asset_name: app.hap
+      #     asset_content_type: application/octet-stream
