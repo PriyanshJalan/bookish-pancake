@@ -1,0 +1,69 @@
+name: Build HarmonyOS App
+
+on:
+  push:
+  workflow_dispatch:
+
+jobs:
+  build:
+    name: "Build HarmonyOS App"
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+
+      - name: Install OH SDK
+        run: |
+          mkdir -p $HOME/openharmony
+          echo "Download commandline-tools-linux-x64-6.0.1.246.zip ..."
+          wget -q https://github.com/cocos/oh-sdk-for-ci/releases/download/api-21/commandline-tools-linux-x64-6.0.1.246.zip.001
+          wget -q https://github.com/cocos/oh-sdk-for-ci/releases/download/api-21/commandline-tools-linux-x64-6.0.1.246.zip.002
+          echo "Unzip commandline-tools-linux-x64-6.0.1.246.zip ..."
+          7z x commandline-tools-linux-x64-6.0.1.246.zip.001 -o$HOME/openharmony > /dev/null
+          cd $HOME/openharmony/command-line-tools
+          ls -l
+
+      - name: Setup OH SDK environment
+        run: |
+          echo "OHOS_SDK_HOME=$HOME/openharmony" >> $GITHUB_ENV
+          echo "$HOME/openharmony/command-line-tools/bin" >> $GITHUB_PATH
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Build HarmonyOS App
+        run: |
+          npm run build
+
+      - name: Find HAP file
+        id: find-hap
+        run: |
+          HAP_FILE=$(find . -name "*.hap" | head -n 1)
+          echo "hap_file=$HAP_FILE" >> $GITHUB_OUTPUT
+          echo "Found HAP: $HAP_FILE"
+
+      - name: Create Release
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: build-${{ github.run_number }}
+          release_name: Build ${{ github.run_number }}
+          draft: false
+          prerelease: false
+
+      - name: Upload Release Asset
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ${{ steps.find-hap.outputs.hap_file }}
+          asset_name: app.hap
+          asset_content_type: application/octet-stream
