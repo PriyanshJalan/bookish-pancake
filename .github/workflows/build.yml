@@ -52,30 +52,30 @@ jobs:
           ls -l
           $HOME/openharmony/command-line-tools/bin/hvigorw assembleHap
 
-      # - name: Find HAP file
-      #   id: find-hap
-      #   run: |
-      #     HAP_FILE=$(find . -name "*.hap" | head -n 1)
-      #     echo "hap_file=$HAP_FILE" >> $GITHUB_OUTPUT
-      #     echo "Found HAP: $HAP_FILE"
+      - name: Find HAP file
+        id: find-hap
+        run: |
+          HAP_FILE=$(find . -name "*.hap" | head -n 1)
+          echo "hap_file=$HAP_FILE" >> $GITHUB_OUTPUT
+          echo "Found HAP: $HAP_FILE"
 
-      # - name: Create Release
-      #   id: create_release
-      #   uses: actions/create-release@v1
-      #   env:
-      #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      #   with:
-      #     tag_name: build-${{ github.run_number }}
-      #     release_name: Build ${{ github.run_number }}
-      #     draft: false
-      #     prerelease: false
+      - name: Create Release
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: build-${{ github.run_number }}
+          release_name: Build ${{ github.run_number }}
+          draft: false
+          prerelease: false
 
-      # - name: Upload Release Asset
-      #   uses: actions/upload-release-asset@v1
-      #   env:
-      #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      #   with:
-      #     upload_url: ${{ steps.create_release.outputs.upload_url }}
-      #     asset_path: ${{ steps.find-hap.outputs.hap_file }}
-      #     asset_name: app.hap
-      #     asset_content_type: application/octet-stream
+      - name: Upload Release Asset
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ${{ steps.find-hap.outputs.hap_file }}
+          asset_name: app.hap
+          asset_content_type: application/octet-stream
