@@ -33,12 +33,11 @@ jobs:
           echo "OHOS_SDK_HOME=$HOME/openharmony" >> $GITHUB_ENV
           echo "$HOME/openharmony/command-line-tools/bin" >> $GITHUB_PATH
 
-      - name: Install dependencies
-        run: npm install
 
       - name: Build HarmonyOS App
         run: |
-          npm run build
+          chmod +x hvigorw
+          ./hvigorw assembleHap
 
       - name: Find HAP file
         id: find-hap
