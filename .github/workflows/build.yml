@@ -36,9 +36,10 @@ jobs:
 
       - name: Setup OH SDK environment
         run: |
+          echo "$GITHUB_PATH"
+          echo "$GITHUB_ENV"
           echo "OHOS_SDK_HOME=$HOME/openharmony" >> $GITHUB_ENV
           echo "$HOME/openharmony/command-line-tools/bin" >> $GITHUB_PATH
-          hvigorw -v
           npm config set registry https://repo.huaweicloud.com/repository/npm/
           npm config set "@ohos:registry" https://repo.harmonyos.com/npm/
           ohpm -v
@@ -49,7 +50,7 @@ jobs:
 
       # - name: Build HarmonyOS App
       #   run: |
-      #     chmod +x hvigorw
+      #     chmod +x $HOME/openharmony/command-line-tools/bin/hvigorw
       #     ./hvigorw assembleHap
 
       # - name: Find HAP file
