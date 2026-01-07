@@ -3,7 +3,13 @@ name: Build HarmonyOS App
 on:
   push:
   workflow_dispatch:
-
+  
+permissions:
+  contents: read
+  issues: write      # or the specific permission needed
+  pull-requests: write
+  actions: write 
+  
 jobs:
   build:
     name: "Build HarmonyOS App"
